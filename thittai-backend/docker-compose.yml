@@ -1,0 +1,36 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - thittai-network
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: userdb
+      MYSQL_USER: tharun
+      MYSQL_PASSWORD: 12345
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - thittai-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+networks:
+  thittai-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
